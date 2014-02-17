@@ -28,7 +28,7 @@
 (defvar *bnf-grammar* '() "grammar is stored as associative list")
 
 (defun bnf-expr (expr)
-  (remove-if #'null (list-split (mappend #'string->list expr) '||)))
+  (remove-if #'null (list-split (mappend #'string->list expr) '|| )))
 
 (defun bnf-term-add (name expr)
   (push (cons name (bnf-expr expr)) *bnf-grammar*))
@@ -45,7 +45,7 @@
   (mappend (lambda (opt) (bnf-match-exact opt str acc)) opts))
 
 (defun bnf-match-exact (opts str &optional (acc nil))
-  (if (eq (car opts) '})
+  (if (eq (car opts) '} )
       (bnf-match-exact (cdr opts) str (cons '} acc))
       (if (null opts)
 	  (unless str (list (reverse acc)))
@@ -56,7 +56,7 @@
 		 (when (char-equal term (car str))
 		   (bnf-match-exact (cdr opts) (cdr str) acc)))
 		(symbol
-		 (bnf-match-any (mapcar (lambda (x) (append x '(}) (cdr opts))) (bnf-term-lookup term)) str (cons '{ (cons term acc))))))))))
+		 (bnf-match-any (mapcar (lambda (x) (append x '( } ) (cdr opts))) (bnf-term-lookup term)) str (cons '{ (cons term acc))))))))))
 
 (defun match (term str)
   (mapcar #'flat->list (bnf-match-exact (list term) (coerce str 'list))))
@@ -95,4 +95,4 @@
 (::= ANY PADDED-JSON-OBJECT)
 
 ;; Test
-(match 'any "  { \"x\" : [1,-2,true,{},3]}")
+(match 'ANY "  { \"x\" : [1,-2,true,{},3]}")
